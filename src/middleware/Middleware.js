@@ -4,7 +4,7 @@ const BCRYPT = require("bcrypt")
 const JWT = require("jsonwebtoken")
 const GET_TOKEN_HEAD = require("./GetTokenHead")
 
-class VALIDATIONS_TOKEN_ID {
+class MIDDLEWARES {
   constructor(){
     this.USER_MODEL = USER_MODEL
     this.BCRYPT = BCRYPT
@@ -25,7 +25,6 @@ class VALIDATIONS_TOKEN_ID {
    * @param {Object} RES - The response object.
    * @param {Function} NEXT - The next function of the middleware.
    */
-
   CHECK_TOKEN_AND_ID = async(REQ, RES, NEXT) => {
     const USER_ID = REQ.params.id
     if(USER_ID.lenght !== 24){
@@ -83,4 +82,4 @@ class VALIDATIONS_TOKEN_ID {
 
 }
 
-module.exports = VALIDATIONS_TOKEN_ID
+module.exports = MIDDLEWARES
