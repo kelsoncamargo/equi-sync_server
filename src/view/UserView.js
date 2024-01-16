@@ -10,3 +10,8 @@ ROUTER.post(
   '/register',
   USER_CONTROLLER.USER_REGISTER
 )
+
+ROUTER.post(
+  '/login',
+  USER_CONTROLLER.USER_LOGIN
+)
