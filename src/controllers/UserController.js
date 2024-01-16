@@ -97,6 +97,17 @@ class USER_CONTROLLER {
     }
   }
 
+  /**
+  * Asynchronous function to log in a user.
+  *
+  * @param {Object} REQ - The HTTP request object.
+  * @param {Object} REQ.body - The body of the HTTP request, which should contain the user data to log in.
+  * @param {string} REQ.body.EMAIL - The user's email.
+  * @param {string} REQ.body.PASSWORD - The user's password.
+  * @param {Object} RES - The HTTP response object.
+  *
+  * @returns {Promise<void>} Does not return anything, but sends an HTTP response to the client.
+  */
   USER_LOGIN = async(REQ, RES) => {
     const USER_SCHEMA = this.ZOD_OBJECT({
       EMAIL: this.ZOD_STRING().email(),
