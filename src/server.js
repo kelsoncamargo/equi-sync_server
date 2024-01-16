@@ -1,6 +1,7 @@
 require('dotenv').config()
 const EXPRESS = require("express")
 const MONGOOSE = require("mongoose")
+const USER_ROUTER = require("./view/UserView")
 
 const APP = EXPRESS()
 const HTTP_PORT = 3000
@@ -8,7 +9,7 @@ const DB_USER = process.env.DB_USER
 const DB_PASS = process.env.DB_PASS
 
 APP.use(EXPRESS.json())
-// APP.use('/user', USER_ROUTER)
+APP.use('/user', USER_ROUTER)
 
 MONGOOSE.connect(
   `mongodb+srv://${DB_USER}:${DB_PASS}@equip-sync.c22vswy.mongodb.net/?retryWrites=true&w=majority/equip-sync`

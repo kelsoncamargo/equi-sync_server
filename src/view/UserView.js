@@ -15,3 +15,5 @@ ROUTER.post(
   '/login',
   USER_CONTROLLER.USER_LOGIN
 )
+
+module.exports = ROUTER
