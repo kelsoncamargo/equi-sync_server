@@ -96,6 +96,47 @@ class USER_CONTROLLER {
       RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE USER, TRY AGAIN LATER " })
     }
   }
+
+  USER_LOGIN = async(REQ, RES) => {
+    const USER_SCHEMA = this.ZOD_OBJECT({
+      EMAIL: this.ZOD_STRING().email(),
+      PASSWORD: this.ZOD_STRING.min(6)
+    })
+
+    const {EMAIL, PASSWORD} = REQ.body
+    
+    try {
+      USER_SCHEMA.parseAsync({
+        EMAIL,
+        PASSWORD,
+      })
+  
+      const USER = await this.USER_MODEL.findOne({ email: EMAIL })
+      if(!!USER){
+        return RES.status(404).json({ msg: "USER NOT FOUND" })
+      }
+
+      const CHECKPASS = await this.BCRYPT.compare(PASSWORD, USER.password)
+      if(!CHECKPASS){
+        return RES.status(404).json({ msg: "PASSWORD INVALID" })
+      }
+
+      const ID = USER._id
+      const SECRET = process.env.SECRET
+      const TOKEN = this.JWT.sign({
+          id: USER._id,
+      }, SECRET, {
+          expiresIn: '24h'
+      })
+
+      USER.white_token = TOKEN
+      await USER.save()
+      
+      RES.status(200).json({ msg: "THE USER LOGGED IN SUCCESSFULLY", TOKEN, ID })
+    }catch(ERROR){
+      RES.status(500).json({ msg: ERROR })      
+    }
+  }
 }
 
 module.exports = USER_CONTROLLER
