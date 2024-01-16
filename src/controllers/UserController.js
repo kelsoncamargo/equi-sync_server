@@ -17,6 +17,23 @@ class USER_CONTROLLER {
     this.JWT = JWT
   }
 
+ /**
+  * Asynchronous function to register a new user.
+  *
+  * @param {Object} REQ - The HTTP request object.
+  * @param {Object} REQ.body - The body of the HTTP request, which should contain the user data to be registered.
+  * @param {string} REQ.body.NAME - The user's name.
+  * @param {string} REQ.body.LAST_NAME - The user's last name.
+  * @param {string} REQ.body.EMAIL - The user's email.
+  * @param {string} REQ.body.PASSWORD - The user's password.
+  * @param {string} REQ.body.CONFIR_PASS - The confirmation of the user's password.
+  * @param {string} REQ.body.PHONE - The user's phone number.
+  * @param {string} REQ.body.DOCUMENT_ID - The user's document ID.
+  * @param {string} REQ.body.COMPANY_NAME - The user's company name.
+  * @param {Object} RES - The HTTP response object.
+  *
+  * @returns {Promise<void>} Does not return anything, but sends an HTTP response to the client.
+ */
   USER_REGISTER = async(REQ, RES) => {
     const USER_SCHEMA = this.ZOD_OBJECT({
       NAME: this.ZOD_STRING().min(4).max(255),

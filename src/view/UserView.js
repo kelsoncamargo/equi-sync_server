@@ -4,6 +4,4 @@ const MIDDLEWARES = require("../middleware/Middleware")
 
 const MIDDLEWARE = new MIDDLEWARES()
 
-ROUTER.post(
-  
-)
+ROUTER.post()
