@@ -35,66 +35,87 @@ class USER_CONTROLLER {
   * @returns {Promise<void>} Does not return anything, but sends an HTTP response to the client.
  */
   USER_REGISTER = async(REQ, RES) => {
+    const { NAME, LAST_NAME, EMAIL, PASSWORD, CONFIR_PASS, PHONE, DOCUMENT_ID, COMPANY_NAME} = REQ.body
+
     const USER_SCHEMA = this.ZOD_OBJECT({
       NAME: this.ZOD_STRING().min(4).max(255),
       LAST_NAME: this.ZOD_STRING().min(4).max(255),
-      EMAIL: this.ZOD_STRING().email().refine(async(IN_EMAIL) => {
-        return await this.USER_FUNCTIONS.VALIDATION_EMAIL(IN_EMAIL)
-      }, {
-        message: "THE EMAIL IS ALREADY IN USE BY ANOTHER USER"
-      }),
-      PASSWORD: this.ZOD_STRING.min(6),
-      CONFIR_PASS: this.ZOD_STRING().refine((VALUE, CONTEXT) => VALUE === CONTEXT.sibling.PASSWORD, {
-        message: "THE PASSWORD NO EQUAL CONFIR_PASS"
-      }),
-      PHONE: this.ZOD_STRING.min(9).max(15).refine(async(IN_PHONE) => {
-        return await this.USER_FUNCTIONS.VALIDATION_PHONE(IN_PHONE)
-      }, {
-        message: "THE PHONE IS ALREADY IN USE BY ANOTHER USER"
-      }),
-      DOCUMENT_ID: this.ZOD_STRING.min(11).refine(async(IN_DOCUMENT_ID) => {
-        return await this.USER_FUNCTIONS.VALIDATION_DOCUMENT_ID(IN_DOCUMENT_ID)
-      }, {
-        message: "THE DOCUMENT_ID IS ALREADY IN USE BY ANOTHER USER"
-      })
+      EMAIL: this.ZOD_STRING().email(),
+      PASSWORD: this.ZOD_STRING().min(6),
+      CONFIR_PASS: this.ZOD_STRING(),
+      PHONE: this.ZOD_STRING().min(9).max(15),
+      DOCUMENT_ID: this.ZOD_STRING().min(11),
+      COMPANY_NAME: this.ZOD_STRING().min(2).max(255),
     })
-    
-    const { NAME, LAST_NAME, EMAIL, PASSWORD, CONFIR_PASS, PHONE, DOCUMENT_ID, COMPANY_NAME} = REQ.body
 
-    try {
-      USER_SCHEMA.parseAsync({
+    try{
+      await USER_SCHEMA.parseAsync({
         NAME,
         LAST_NAME,
         EMAIL,
         PASSWORD,
         CONFIR_PASS,
         PHONE,
-        DOCUMENT_ID
+        DOCUMENT_ID,
+        COMPANY_NAME
       })
 
-      const SALT = await this.BCRYPT.genSalt(12)
-      const PASSHASH = await this.BCRYPT.hash(PASSWORD, SALT)
-      const USER = new this.USER_MODEL({
-        name: NAME,
-        last_name: LAST_NAME,
-        email: EMAIL,
-        password: PASSHASH,
-        phone: PHONE,
-        document_id: DOCUMENT_ID,
-        company_name: COMPANY_NAME
-      })
-      
-      const EQUIPMENT = new this.EQUIPMENT_MODEL()
-      try {
-        USER.equipments = EQUIPMENT._id
+      try{
+        const SALT = await this.BCRYPT.genSalt(12)
+        const PASSHASH = await this.BCRYPT.hash(PASSWORD, SALT)
+        const USER = new this.USER_MODEL({
+          name: NAME,
+          last_name: LAST_NAME,
+          email: EMAIL,
+          password: PASSHASH,
+          phone: PHONE,
+          document_id: DOCUMENT_ID,
+          company_name: COMPANY_NAME
+        })
+        const EQUIPMENT = new this.EQUIPMENT_MODEL()
         await USER.save()
-        RES.status(201).json({ msg: "USER AND EQUIPMENT CREATED WITH SUCESS" })
+        await EQUIPMENT.save()
+        try{
+          USER.equipments = EQUIPMENT._id
+          await USER.save()
+          RES.status(201).json({ msg: "USER AND EQUIPMENT CREATED WITH SUCESS" })
+        }catch(ERROR){
+        RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN ASSIGN EQUIPMENT ID TO THE USER, TRY AGAIN LATER "})
+        }
       }catch(ERROR){
-        RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE EQUIPMENT, TRY AGAIN LATER " })
+        RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE USER AND EQUIPMENT USER, TRY AGAIN LATER " })
       }
+      
     }catch(ERROR){
-      RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE USER, TRY AGAIN LATER " })
+      RES.status(400).json({ msg: ERROR.message })
     }
+
+    // try {
+    //   const SALT = await this.BCRYPT.genSalt(12)
+    //   const PASSHASH = await this.BCRYPT.hash(PASSWORD, SALT)
+    //   const USER = new this.USER_MODEL({
+    //     name: NAME,
+    //     last_name: LAST_NAME,
+    //     email: EMAIL,
+    //     password: PASSHASH,
+    //     phone: PHONE,
+    //     document_id: DOCUMENT_ID,
+    //     company_name: COMPANY_NAME
+    //   })
+    //   const EQUIPMENT = new this.EQUIPMENT_MODEL
+      
+    //   await USER.save()
+    //   await EQUIPMENT.save()
+    //   try {
+    //     USER.equipments = await EQUIPMENT._id
+    //     await USER.save()
+    //     RES.status(201).json({ msg: "USER AND EQUIPMENT CREATED WITH SUCESS" })
+    //   }catch(ERROR){
+    //     RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN ASSIGN EQUIPMENT ID TO THE USER, TRY AGAIN LATER "})
+    //   }
+    // }catch(ERROR){
+    //   RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE USER AND EQUIPMENT USER, TRY AGAIN LATER " })
+    // }
   }
 
   /**
