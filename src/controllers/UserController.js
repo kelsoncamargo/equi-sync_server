@@ -40,11 +40,25 @@ class USER_CONTROLLER {
     const USER_SCHEMA = this.ZOD_OBJECT({
       NAME: this.ZOD_STRING().min(4).max(255),
       LAST_NAME: this.ZOD_STRING().min(4).max(255),
-      EMAIL: this.ZOD_STRING().email(),
+      EMAIL: this.ZOD_STRING().email().refine(async(EMAIL) => {
+          return await this.USER_FUNCTIONS.VALIDATION_EMAIL(EMAIL)
+      }, {
+        message: "THE EMAIL IS ALREADY IN USE BY ANOTHER USER"
+      }),
       PASSWORD: this.ZOD_STRING().min(6),
-      CONFIR_PASS: this.ZOD_STRING(),
-      PHONE: this.ZOD_STRING().min(9).max(15),
-      DOCUMENT_ID: this.ZOD_STRING().min(11),
+      CONFIR_PASS: this.ZOD_STRING().refine(CONFIR_PASS => CONFIR_PASS === PASSWORD, {
+        message: "THE PASSWORD NO EQUAL CONFIR_PASS"
+      }),
+      PHONE: this.ZOD_STRING().min(9).max(15).refine(async(PHONE) => {
+        return await this.USER_FUNCTIONS.VALIDATION_PHONE(PHONE)
+    }, {
+      message: "THE PHONE IS ALREADY IN USE BY ANOTHER USER"
+    }),
+      DOCUMENT_ID: this.ZOD_STRING().min(11).refine(async(DOCUMENT_ID) => {
+        return await this.USER_FUNCTIONS.VALIDATION_DOCUMENT_ID(DOCUMENT_ID)
+    }, {
+      message: "THE DOCUMENT_ID IS ALREADY IN USE BY ANOTHER USER"
+    }),
       COMPANY_NAME: this.ZOD_STRING().min(2).max(255),
     })
 
@@ -89,33 +103,6 @@ class USER_CONTROLLER {
     }catch(ERROR){
       RES.status(400).json({ msg: ERROR.message })
     }
-
-    // try {
-    //   const SALT = await this.BCRYPT.genSalt(12)
-    //   const PASSHASH = await this.BCRYPT.hash(PASSWORD, SALT)
-    //   const USER = new this.USER_MODEL({
-    //     name: NAME,
-    //     last_name: LAST_NAME,
-    //     email: EMAIL,
-    //     password: PASSHASH,
-    //     phone: PHONE,
-    //     document_id: DOCUMENT_ID,
-    //     company_name: COMPANY_NAME
-    //   })
-    //   const EQUIPMENT = new this.EQUIPMENT_MODEL
-      
-    //   await USER.save()
-    //   await EQUIPMENT.save()
-    //   try {
-    //     USER.equipments = await EQUIPMENT._id
-    //     await USER.save()
-    //     RES.status(201).json({ msg: "USER AND EQUIPMENT CREATED WITH SUCESS" })
-    //   }catch(ERROR){
-    //     RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN ASSIGN EQUIPMENT ID TO THE USER, TRY AGAIN LATER "})
-    //   }
-    // }catch(ERROR){
-    //   RES.status(500).json({ msg: "HAVE A ERROR IN SERVER, IN CREATE USER AND EQUIPMENT USER, TRY AGAIN LATER " })
-    // }
   }
 
   /**
