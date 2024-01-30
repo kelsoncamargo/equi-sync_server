@@ -2,7 +2,7 @@ require("dotenv").config()
 const USER_MODEL = require("../model/UserModel")
 const BCRYPT = require("bcrypt")
 const JWT = require("jsonwebtoken")
-const GET_TOKEN_HEAD = require("./GetTokenHead")
+const GET_TOKEN_HEAD = require("../functions/GetTokenHead")
 
 class MIDDLEWARES {
   constructor(){
@@ -27,7 +27,7 @@ class MIDDLEWARES {
    */
   CHECK_TOKEN_AND_ID = async(REQ, RES, NEXT) => {
     const USER_ID = REQ.params.id
-    if(USER_ID.lenght !== 24){
+    if(USER_ID.length !== 24){
       return RES.status(422).json({ msg: "USER ID IS INVALID" })
     }
 
