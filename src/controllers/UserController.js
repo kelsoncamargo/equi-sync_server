@@ -7,7 +7,7 @@ const JWT = require("jsonwebtoken")
 const GET_TOKEN_HEAD = require('../functions/GetTokenHead')
 require("dotenv").config()
 
-class USER_CONTROLLER {
+class USER_CONTROLLER { 
  /**
   * Asynchronous function to register a new  user.
   *

@@ -1,7 +1,8 @@
 require('dotenv').config()
 const EXPRESS = require("express")
 const MONGOOSE = require("mongoose")
-const USER_ROUTER = require("./view/UserView")
+const USER_VIEW = require("./view/UserView")
+const EQUIPMENT_VIEW = require("./view/EquipmentView")
 
 const APP = EXPRESS()
 const HTTP_PORT = 3000
@@ -9,7 +10,8 @@ const DB_USER = process.env.DB_USER
 const DB_PASS = process.env.DB_PASS
 
 APP.use(EXPRESS.json())
-APP.use('/user', USER_ROUTER)
+APP.use('/user', USER_VIEW)
+APP.use('/equipment', EQUIPMENT_VIEW)
 
 MONGOOSE.connect(
   `mongodb+srv://${DB_USER}:${DB_PASS}@equip-sync.c22vswy.mongodb.net/equip-sync?retryWrites=true&w=majority`
